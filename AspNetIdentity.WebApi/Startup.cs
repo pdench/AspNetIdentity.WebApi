@@ -32,8 +32,8 @@ namespace AspNetIdentity.WebApi
         private void ConfigureOAuthTokenGeneration(IAppBuilder app)
         {
             // Configure the db context and user manager to use a single instance per request
-            AppBuilderExtensions.CreatePerOwinContext(ApplicationDbContext.Create);
-            AppBuilderExtensions.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
+            app.CreatePerOwinContext(ApplicationDbContext.Create);
+            app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
 
             // Plugin the OAuth bearer JSON Web Token tokens generation and Consumption will be here
 

@@ -4,6 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using AspNetIdentity.WebApi.Models;
+using AspNetIdentity.WebApi.Infrastructure;
+using Microsoft.AspNet.Identity;
 
 namespace AspNetIdentity.WebApi.Controllers
 {
@@ -37,6 +40,35 @@ namespace AspNetIdentity.WebApi.Controllers
                 return Ok(this.TheModelFactory.Create(user));
             }
             return NotFound();
+        }
+
+        [Route("create")]
+        public async Task<IHttpActionResult> CreateUser(CreateUserBindingModel createUserModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var user = new ApplicationUser()
+            {
+                UserName = createUserModel.Username,
+                Email = createUserModel.Email,
+                FirstName = createUserModel.FirstName,
+                LastName = createUserModel.LastName,
+                Level = 3,
+                JoinDate = DateTime.Now.Date
+            };
+
+            IdentityResult addUserResult = await this.AppUserManager.CreateAsync(user, createUserModel.Password);
+
+            if (!addUserResult.Succeeded)
+            {
+                return GetErrorResult(addUserResult);
+            }
+
+            Uri locationHeader = new Uri(Url.Link("GetUserById", new { id = user.Id }));
+
+            return Created(locationHeader, TheModelFactory.Create(user));
         }
     }
 }
