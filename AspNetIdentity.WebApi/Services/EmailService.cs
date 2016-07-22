@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Threading.Tasks;
+using System.Net;
 using System.Net.Mail;
-using System.Net.Mime;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using System.Configuration;
 
 namespace AspNetIdentity.WebApi.Services
 {
@@ -17,24 +20,21 @@ namespace AspNetIdentity.WebApi.Services
             await configSendGridAsync(message);
         }
 
-        private Task configSendGridAsync(IdentityMessage message)
+        private async Task configSendGridAsync(IdentityMessage message)
         {
             try
             {
-                MailMessage message = new MailMessage();
-                message.To.Add(new MailAddress("pdench@denchconsulting.com", "To Name"));
-                message.From = new MailAddress("pfdench@gmail.com");
-                message.Subject = "SendGrid Message";
-                string text = "text body";
-                string html = @"<p>html body</p>";
 
-                message.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(text, null, MediaTypeNames.Text.Plain));
-                message.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(html, null, MediaTypeNames.Text.Html));
+                string apiKey = ConfigurationManager.AppSettings["sendgridkey"];
+                dynamic sg = new SendGridAPIClient(apiKey);
 
-                SmtpClient client = new SmtpClient("smtp.sendgrid.net", Convert.ToInt32(587));
-                System.Net.NetworkCredential credentials = new System.Net.NetworkCredential("pdench", "cAssius5");
-                client.Credentials = credentials;
-                client.Send(message);
+                Email from = new Email("test@example.com");
+                String subject = message.Subject;
+                Email to = new Email("pfdench@gmail.com");
+                Content content = new Content("text/html", message.Body);
+                Mail mail = new Mail(from, subject, to, content);
+
+                dynamic response = sg.client.mail.send.post(requestBody: mail.Get());
             }
             catch (Exception ex)
             {

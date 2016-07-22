@@ -33,7 +33,7 @@ namespace AspNetIdentity.WebApi.Models
         public string RoleName { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage ="The {0} must be at least {2} characters long.", MinimumLength =6)]
+        [StringLength(15, ErrorMessage ="The {0} must be at least {2} characters long.", MinimumLength =6)]
         [DataType(DataType.Password)]
         [Display(Name ="Password")]
         public string Password { get; set; }
@@ -44,5 +44,25 @@ namespace AspNetIdentity.WebApi.Models
         [Compare("Password", ErrorMessage ="The password and confirm password do not match.")]
         public string ConfirmPassword { get; set; }
 
+    }
+
+    public class ChangePasswordBingingModel
+    {
+        [Required]
+        [DataType(DataType.Password)]
+        [Display(Name ="Current Password")]
+        public string CurrentPassword { get; set; }
+
+        [Required]
+        [DataType(DataType.Password)]
+        [StringLength(15, ErrorMessage ="The {0} must be at least {2} characters long.", MinimumLength =6)]
+        [Display(Name ="New Password")]
+        public string NewPassword { get; set; }
+
+        [Required]
+        [DataType(DataType.Password)]
+        [Display(Name="Confirm New Password")]
+        [Compare("NewPassword", ErrorMessage ="The new password and confirm password do not match.")]
+        public string ConfirmPassword { get; set; }
     }
 }
