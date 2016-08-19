@@ -29,14 +29,16 @@ namespace AspNetIdentity.WebApi.Providers
             if (user == null)
             {
                 context.SetError("invalid grant", "The user name or password is incorrect");
-                return null;
+                //return null;
             }
             if (!user.EmailConfirmed)
             {
                 context.SetError("invalid grant", "User did not confirm email");
-                return null;
+                //return null;
             }
             ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(userManager, "JWT");
+            oAuthIdentity.AddClaims(ExtendedClaimsProvider.GetClaims(user));
+            oAuthIdentity.AddClaims(RolesFromClaims.CreateRolesBasedOnClaims(oAuthIdentity));
             var ticket = new AuthenticationTicket(oAuthIdentity, null);
             context.Validated(ticket);
         }
